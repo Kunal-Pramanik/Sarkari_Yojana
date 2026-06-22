@@ -2,10 +2,26 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 from datetime import datetime
 import os
+import json
 
-# Initialize Firebase
-cred = credentials.Certificate("firebase_key.json")
-firebase_admin.initialize_app(cred)
+# ── Initialize Firebase ────────────────────────────────────────────────────
+def init_firebase():
+    if firebase_admin._apps:
+        return  # Already initialized
+
+    firebase_key_json = os.getenv("FIREBASE_KEY_JSON")
+    if firebase_key_json:
+        # Production (Render) — read from environment variable
+        key_dict = json.loads(firebase_key_json)
+        cred = credentials.Certificate(key_dict)
+    else:
+        # Local development — read from file
+        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+        cred = credentials.Certificate(os.path.join(BASE_DIR, "firebase_key.json"))
+
+    firebase_admin.initialize_app(cred)
+
+init_firebase()
 db = firestore.client()
 
 # ─────────────────────────────────────────
@@ -51,17 +67,14 @@ def update_session_title(session_id: str, title: str):
 
 def delete_session(session_id: str, user_id: str):
     """Delete a session and all its messages"""
-    # Verify ownership first
     session = db.collection("sessions").document(session_id).get()
     if not session.exists or session.to_dict().get("user_id") != user_id:
         return False
-    
-    # Delete all messages in session
+
     messages = db.collection("messages").where("session_id", "==", session_id).stream()
     for msg in messages:
         msg.reference.delete()
-    
-    # Delete session
+
     db.collection("sessions").document(session_id).delete()
     return True
 
@@ -74,22 +87,20 @@ def save_message(session_id: str, user_id: str, role: str, content: str):
     db.collection("messages").add({
         "session_id": session_id,
         "user_id": user_id,
-        "role": role,  # "user" or "assistant"
+        "role": role,
         "content": content,
         "timestamp": datetime.utcnow()
     })
-    # Update session's updated_at
     db.collection("sessions").document(session_id).update({
         "updated_at": datetime.utcnow()
     })
 
 def get_session_messages(session_id: str, user_id: str) -> list:
     """Get all messages for a session"""
-    # Verify ownership
     session = db.collection("sessions").document(session_id).get()
     if not session.exists or session.to_dict().get("user_id") != user_id:
         return []
-    
+
     messages = (
         db.collection("messages")
         .where("session_id", "==", session_id)
@@ -122,4 +133,4 @@ def get_recent_messages_for_memory(session_id: str, limit: int = 10) -> list:
             "role": data.get("role"),
             "content": data.get("content")
         })
-    return list(reversed(result))  # Return in chronological order
+    return list(reversed(result))
