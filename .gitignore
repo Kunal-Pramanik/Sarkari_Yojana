@@ -1,0 +1,35 @@
+# =========================
+# Environment Variables (CRITICAL)
+# =========================
+.env
+.env.local
+.env.*.local
+
+# =========================
+# Python / Backend (FastAPI)
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.venv/
+*.log
+
+
+
+# =========================
+# Node / Frontend (Next.js)
+# =========================
+node_modules/
+.next/
+out/
+build/
+.npm/
+
+# =========================
+# OS & Editor Files
+# =========================
+.DS_Store
+.vscode/
+.idea/backend/firebase_key.json
