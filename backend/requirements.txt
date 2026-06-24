@@ -1,14 +1,16 @@
 --extra-index-url https://download.pytorch.org/whl/cpu
-
-fastapi
-uvicorn
-groq
-pydantic
-python-dotenv
-sentence-transformers
-faiss-cpu
-pandas
-numpy
+fastapi==0.111.0
+uvicorn==0.29.0
+groq==0.9.0
+pydantic==2.7.1
+python-dotenv==1.0.1
+sentence-transformers==2.7.0
+faiss-cpu==1.8.0
+pandas==2.2.2
+numpy==1.26.4
 supabase==2.4.0
+gotrue==2.4.0
+httpx==0.24.1
 firebase-admin==6.4.0
-torch
+torch==2.2.2+cpu
+httpcore==0.17.3
