@@ -16,7 +16,20 @@ env/
 .venv/
 *.log
 
+# =========================
+# Sensitive files (NEVER commit)
+# =========================
+backend/firebase_key.json
+firebase_key.json
+*.json.key
 
+# =========================
+# Large model files (not needed on server)
+# =========================
+backend/faiss_index/
+*.pkl
+*.pt
+*.bin
 
 # =========================
 # Node / Frontend (Next.js)
@@ -32,4 +45,4 @@ build/
 # =========================
 .DS_Store
 .vscode/
-.idea/backend/firebase_key.json
+.idea/
